@@ -1,3 +1,14 @@
+"""
+config.py
+------------------
+Load env config variables
+
+This module:
+- Loads the gemini api key from the env file
+- Sets debug variable to true or false 
+"""
+
+
 from dotenv import load_dotenv
 import os
 
