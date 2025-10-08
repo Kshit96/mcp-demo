@@ -1,3 +1,15 @@
+"""
+gemini_api_call.py
+------------------
+Simple python file to connect to gemini and make an api call
+
+This module:
+- Loads the gemini api key from the env file
+- Creates the client
+- Makes the api call
+- Prints the response
+"""
+
 from google import genai
 from google.genai import types
 from dotenv import load_dotenv
