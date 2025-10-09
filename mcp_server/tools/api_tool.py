@@ -1,5 +1,5 @@
 import httpx
-from mcp.server.fastmcp import FastMCP
+from fastmcp import FastMCP
 
 class APITool:
     """
@@ -13,7 +13,7 @@ class APITool:
         self._register_tool()
     
     def _register_tool(self):
-        @self.app.tool()
+        @self.app.tool
 
         def fetch_data(endpoint: str):
             """
