@@ -14,7 +14,6 @@ class APITool:
     
     def _register_tool(self):
         @self.app.tool
-
         def fetch_data(endpoint: str):
             """
             Fetch data from a public API endpoint relative to base_url.

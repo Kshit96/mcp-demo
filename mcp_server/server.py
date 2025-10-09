@@ -12,7 +12,7 @@ from mcp_server.tools.api_tool import APITool
 
 def create_app() -> FastMCP:
     config = Config()
-    app = FastMCP("PublicAPIServer")
+    app = FastMCP("MCPDemoServer")
 
     # Register all tools
     APITool(app, base_url=config.default_api_url)
@@ -29,7 +29,8 @@ if __name__ == "__main__":
 HOW TO RUN:
 1. When you want to run it as a module using python3: python3 -m mcp_server.server    
 2. When you want to run it using fastmcp cli: PYTHONPATH=. FASTMCP_LOG_LEVEL=debug fastmcp run ./mcp_server/server.py:create_app (to run it in stdio mode)
-3. When you want to run it using fastmcp cli: PYTHONPATH=. FASTMCP_LOG_LEVEL=debug fastmcp run ./mcp_server/server.py:create_app --transport http --port 8000 in http mode (to run it in http mode)
+3. When you want to run it using fastmcp cli: PYTHONPATH=. FASTMCP_LOG_LEVEL=debug fastmcp run ./mcp_server/server.py:create_app --transport http --port 8000 (to run it in http mode)
+4. When you want to run the server in dev mode: PYTHONPATH=. FASTMCP_LOG_LEVEL=debug fastmcp dev ./mcp_server/server.py:create_app
 
 NOTE: fastmcp run ignores the main function, hence we use the factory function call directly to return an app
 
