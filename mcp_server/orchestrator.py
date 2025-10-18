@@ -11,6 +11,7 @@ Run: PYTHONPATH=. python3 -m mcp_server.orchestrator
 from __future__ import annotations
 import os
 import asyncio
+import pprint
 from typing import Any, Dict, List, Optional
 
 from dotenv import load_dotenv
@@ -198,14 +199,33 @@ class GeminiMCPOrchestrator:
                 tools=[tool_block],
                 system_instruction="You are a helpful assistant. Use tools only when external data is required."
             )
+    def _deep_convert_map_composite(self, obj: Any) -> Any:
+        """
+        Recursively converts "dict-like" objects (like MapComposite)
+        and their contents into plain Python dicts and lists.
+        """
+        # This check is the fix:
+        # Instead of isinstance(obj, dict), we check for the .items() method.
+        # This works for both regular dicts and MapComposite.
+        if hasattr(obj, 'items'):
+            return {k: self._deep_convert_map_composite(v) for k, v in obj.items()}
+        elif isinstance(obj, list):
+            return [self._deep_convert_map_composite(v) for v in obj]
+        else:
+            return obj
 
     def _extract_function_calls(self, response) -> List[Dict[str, Any]]:
         out = []
         for cand in getattr(response, "candidates", []) or []:
+            
             for part in cand.content.parts:
+                print('PART')
+                pprint.pprint(part)
                 fc = getattr(part, "function_call", None)
                 if fc:
-                    out.append({"name": fc.name, "args": dict(fc.args)})
+                    # Use the deep-convert helper to create a plain dict
+                    plain_args = self._deep_convert_map_composite(fc.args)
+                    out.append({"name": fc.name, "args": plain_args})
         return out
 
     async def run_query(self, user_query: str) -> str:
@@ -215,16 +235,18 @@ class GeminiMCPOrchestrator:
         q_emb = embed_query(user_query)
         candidates = retrieve_api_candidates(self.pg_dsn, q_emb, k=self.top_k)
         top_sim = candidates[0]["cosine_sim"] if candidates else 0.0
-
         # If below threshold → no tool; answer directly
         if not candidates or (top_sim is None) or (top_sim < self.api_threshold):
             plan = self.model.generate_content(contents=[
                 {"role": "user", "parts": [{"text": user_query}]}
             ])
             return plan.text
-
+        
         # Above threshold → include API CARDS and let model plan a function_call
         api_cards = make_api_cards(candidates)
+        # print('API_CARDS')
+        # pprint.pprint(api_cards)
+        
         plan = self.model.generate_content(
             contents=[
                 {"role": "model", "parts": [{"text": SYSTEM_HTTP}]},
@@ -232,7 +254,10 @@ class GeminiMCPOrchestrator:
                 {"role": "user",  "parts": [{"text": user_query}]},
             ]
         )
+        # print('Plan')
+        # pprint.pprint(plan)
         calls = self._extract_function_calls(plan)
+        print(calls)
         if not calls:
             # Model decided to answer without tools
             return plan.text
@@ -247,9 +272,30 @@ class GeminiMCPOrchestrator:
                     tool_parts.append({"function_response": {"name": name, "response": {"error": "unknown tool"}}})
                     continue
 
-                endpoint = args.get("endpoint", "")
+                endpoint = args.get("endpoint")
+                method = args.get("method")
+                params = args.get("params")
+                headers = args.get("headers")
+                body = args.get("body") # body is allowed to be None
                 if not isinstance(endpoint, str) or not endpoint.startswith("https://") or not endpoint_allowed(endpoint, candidates):
-                    tool_parts.append({"function_response": {"name": name, "response": {"error": "endpoint not allowed"}}})
+                    tool_parts.append({"function_response": {"name": name, "response": {"error": f"Invalid or disallowed endpoint: {endpoint}"}}})
+                    continue
+                
+                # 2. Check other arguments for correct type (this is the fix)
+                if method is not None and not isinstance(method, str):
+                    tool_parts.append({"function_response": {"name": name, "response": {"error": f"Invalid 'method', must be a string, got {type(method)}"}}})
+                    continue
+                
+                if params is not None and not isinstance(params, dict):
+                    tool_parts.append({"function_response": {"name": name, "response": {"error": f"Invalid 'params', must be an object/dict, got {type(params)}"}}})
+                    continue
+
+                if headers is not None and not isinstance(headers, dict):
+                    tool_parts.append({"function_response": {"name": name, "response": {"error": f"Invalid 'headers', must be an object/dict, got {type(headers)}"}}})
+                    continue
+                
+                if body is not None and not isinstance(body, (dict, str)):
+                    tool_parts.append({"function_response": {"name": name, "response": {"error": f"Invalid 'body', must be an object/dict or string, got {type(body)}"}}})
                     continue
 
                 # Normalize containers
@@ -257,7 +303,7 @@ class GeminiMCPOrchestrator:
                     if k in args and not isinstance(args[k], dict):
                         tool_parts.append({"function_response": {"name": name, "response": {"error": f"{k} must be object"}}})
                         break
-
+                
                 result = await mcp.call_tool("fetch_data", args)
                 
                 # Extract the dictionary from the result object
@@ -289,4 +335,5 @@ if __name__ == "__main__":
         api_threshold=0.70,   # tweak as you observe behavior
         top_k=5,
     )
-    print(orch.run("Give me some user data"))
+    print(orch.run("Give a fake blog post"))
+    print(orch.run("Give me a random trivia fact, irrespective of the difficult or category"))

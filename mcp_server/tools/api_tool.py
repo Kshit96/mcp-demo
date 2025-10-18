@@ -52,7 +52,15 @@ class APITool:
             }
             """
             try:
-                qp = {k: v for k, v in (params or {}).items() if v is not None}
+                qp = {}
+                for k, v in (params or {}).items():
+                    if v is None:
+                        continue
+                    # Convert floats like 1.0 to 1, but keep 1.5 as 1.5
+                    if isinstance(v, float) and v.is_integer():
+                        qp[k] = int(v)
+                    else:
+                        qp[k] = v
                 hdrs = {k: v for k, v in (headers or {}).items() if v is not None}
 
                 method_u = method.upper().strip()
