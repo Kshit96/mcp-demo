@@ -219,8 +219,6 @@ class GeminiMCPOrchestrator:
         for cand in getattr(response, "candidates", []) or []:
             
             for part in cand.content.parts:
-                print('PART')
-                pprint.pprint(part)
                 fc = getattr(part, "function_call", None)
                 if fc:
                     # Use the deep-convert helper to create a plain dict
@@ -244,8 +242,6 @@ class GeminiMCPOrchestrator:
         
         # Above threshold → include API CARDS and let model plan a function_call
         api_cards = make_api_cards(candidates)
-        # print('API_CARDS')
-        # pprint.pprint(api_cards)
         
         plan = self.model.generate_content(
             contents=[
@@ -254,8 +250,6 @@ class GeminiMCPOrchestrator:
                 {"role": "user",  "parts": [{"text": user_query}]},
             ]
         )
-        # print('Plan')
-        # pprint.pprint(plan)
         calls = self._extract_function_calls(plan)
         print(calls)
         if not calls:
@@ -297,12 +291,6 @@ class GeminiMCPOrchestrator:
                 if body is not None and not isinstance(body, (dict, str)):
                     tool_parts.append({"function_response": {"name": name, "response": {"error": f"Invalid 'body', must be an object/dict or string, got {type(body)}"}}})
                     continue
-
-                # Normalize containers
-                for k in ("params", "headers"):
-                    if k in args and not isinstance(args[k], dict):
-                        tool_parts.append({"function_response": {"name": name, "response": {"error": f"{k} must be object"}}})
-                        break
                 
                 result = await mcp.call_tool("fetch_data", args)
                 
