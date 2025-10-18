@@ -15,7 +15,7 @@ def create_app() -> FastMCP:
     app = FastMCP("MCPDemoServer")
 
     # Register all tools
-    APITool(app, base_url=config.default_api_url)
+    APITool(app)
 
     return app
 
