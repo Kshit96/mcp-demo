@@ -235,9 +235,14 @@ class GeminiMCPOrchestrator:
         top_sim = candidates[0]["cosine_sim"] if candidates else 0.0
         # If below threshold → no tool; answer directly
         if not candidates or (top_sim is None) or (top_sim < self.api_threshold):
-            plan = self.model.generate_content(contents=[
-                {"role": "user", "parts": [{"text": user_query}]}
-            ])
+            print("DEBUG: Low similarity detected. Answering directly (tool use disabled).")
+            plan = self.model.generate_content(
+                contents=[
+                    {"role": "user", "parts": [{"text": user_query}]}
+                ],
+                # THIS IS THE FIX: Explicitly disable tool calling
+                tool_config={"function_calling_config": {"mode": "NONE"}}
+            )
             return plan.text
         
         # Above threshold → include API CARDS and let model plan a function_call
@@ -251,9 +256,18 @@ class GeminiMCPOrchestrator:
             ]
         )
         calls = self._extract_function_calls(plan)
-        print(calls)
+        calls = self._extract_function_calls(plan)
         if not calls:
-            # Model decided to answer without tools
+            # Model decided to answer without tools (RAG "false positive").
+            # This is our chance to fall back to a direct answer.
+            print("DEBUG: High similarity, but model chose not to use tools. Retrying in fallback mode.")
+            plan = self.model.generate_content(
+                contents=[
+                    {"role": "user", "parts": [{"text": user_query}]}
+                ],
+                # Explicitly disable tool calling
+                tool_config={"function_calling_config": {"mode": "NONE"}}
+            )
             return plan.text
 
         # Execute tool calls with allowlist validation
@@ -292,7 +306,21 @@ class GeminiMCPOrchestrator:
                     tool_parts.append({"function_response": {"name": name, "response": {"error": f"Invalid 'body', must be an object/dict or string, got {type(body)}"}}})
                     continue
                 
-                result = await mcp.call_tool("fetch_data", args)
+                clean_call_args = {
+                    "endpoint": endpoint,
+                    "body": body  # Body is allowed to be None
+                }
+                
+                # Only add these parameters if they were actually provided
+                if method is not None:
+                    clean_call_args["method"] = method
+                if params is not None:
+                    clean_call_args["params"] = params
+                if headers is not None:
+                    clean_call_args["headers"] = headers
+
+                # Call the tool with the NEW, CLEAN dictionary
+                result = await mcp.call_tool("fetch_data", clean_call_args)
                 
                 # Extract the dictionary from the result object
                 response_data = result.structured_content
@@ -325,3 +353,4 @@ if __name__ == "__main__":
     )
     print(orch.run("Give a fake blog post"))
     print(orch.run("Give me a random trivia fact, irrespective of the difficult or category"))
+    print(orch.run("Tell me a joke"))
