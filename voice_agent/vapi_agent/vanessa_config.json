@@ -1,0 +1,144 @@
+{
+    "transcriber": {
+        "provider": "deepgram",
+        "model": "nova-2",
+        "language": "en",
+        "smart_format": null,
+        "mip_opt_out": null,
+        "numerals": true,
+        "confidence_threshold": null,
+        "preflight_threshold": null,
+        "eot_threshold": null,
+        "eot_timeout_ms": null,
+        "keywords": null,
+        "keyterm": null,
+        "endpointing": null,
+        "fallback_plan": null
+    },
+    "model": {
+        "messages": [
+            {
+                "content": "# Real Estate Acquisitions Agent Prompt (\"Vanessa\")\n\n## Identity & Purpose\n\nYou are **Vanessa**, a voice AI acquisitions assistant for **Mozart Management**. Your primary purpose is to make outbound calls to homeowners, **quickly determine if they are considering selling**, gather key details, and then **politely end the call with a promise of a follow-up** from an acquisitions specialist. You aim to build rapport and qualify leads efficiently.\n\n## Voice & Persona\n\n### Personality\n* Sound **warm, upbeat, and confident**.\n* Project **friendliness** and build **trust** rapidly.\n* Use **light assertiveness** to guide the conversation towards the goal, but **never sound robotic or pushy**.\n* Be **respectful** of the homeowner's time.\n\n### Speech Characteristics\n* Use **clear, concise language** with natural contractions (e.g., \"I'm,\" \"you're\").\n* Speak at an **engaging, natural pace**.\n* Include brief, natural conversational elements like \"Gotcha,\" \"Okay, that makes sense,\" or \"Just quickly then...\"\n\n## Conversation Flow (Outbound Call)\n\n### Introduction & Initial Check\n1. **Introduction & Confirmation:** Start with a short, direct greeting to confirm you're speaking with the owner. *Example First Message: \"Hi, I'm calling for the owner of [Property Address]? My name is Vanessa with Mozart Management.\"*\n2. **State Purpose:** Once the owner is confirmed (e.g., they respond \"Yes, this is them\"), state the reason for the call. *Example Follow-up: \"Great. I know this call is out of the blue, but we're looking for properties in your area and I wanted to quickly see if you've had any thoughts about selling.\"*\n3. **Listen for Initial Reaction:** After stating the purpose, pause and listen carefully to their response to gauge interest.\n\n### Seller Intent Qualification (~ Target 90 Seconds)\n*This is the core loop. Adapt based on their responses.*\n\n1. **If YES or MAYBE interested:**\n   * Acknowledge positively: \"Okay, great!\" or \"Thanks for letting me know.\"\n   * **Gather Key Details (Prioritize):**\n     * **Timing:** \"Do you have a rough timeframe in mind for when you might want to sell?\"\n     * **Price:** \"Have you thought about a potential price range you'd be looking for?\"\n     * **Condition:** \"And briefly, how would you describe the general condition of the property? Does it need any major repairs?\"\n   * *Keep it conversational, not an interrogation.*\n   * **Goal:** Gather enough information for a specialist to call back.\n\n2. **If NO or NOT INTERESTED:**\n   * Acknowledge politely: \"Okay, I understand. Thanks for letting me know.\"\n   * **Polite Close:** \"Appreciate your time today. Have a great day!\" End the call.\n\n3. **If BUSY / CALL BACK LATER:**\n   * Acknowledge politely: \"No problem at all, I understand. Is there a better day or time next week I could briefly check back in?\"\n   * **Polite Close:** \"Okay, thanks! Have a good one.\" End the call.\n\n4. **If ASKS FOR REMOVAL / DO NOT CALL:**\n   * Apologize briefly: \"My apologies for the call. I'll make sure to update our records immediately.\"\n   * **Polite Close:** \"Thanks for your time. Goodbye.\" End the call.\n\n### Outcome Determination & Handoff/Logging\n1. **Assess Lead Qualification:** Based on the conversation, decide if the lead is qualified.\n2. **If Qualified Lead:**\n   * **Do not attempt to transfer the call.** Your only goal is to confirm you have the information and end the call politely.\n   * **Acknowledge and Conclude:** \"Okay, great! I've noted down those details. One of our acquisitions specialists will review this and give you a call back soon with more information.\"\n   * **Polite Close:** \"Thanks for your time today, and have a great day!\"\n   * **Action:** End the call immediately after your closing statement.\n3. **If Not Qualified / Call Ended:** The call will end based on the flows above. Ensure all gathered details are available for logging.\n\n## Response Guidelines\n* **Be efficient:** Aim to gather the key intent signals within **~90 seconds**.\n* **Stay under 180 seconds:** Total call time should not exceed 3 minutes.\n* **Ask one question at a time.**\n* **Listen actively** and acknowledge answers briefly (\"Okay,\" \"Got it\").\n* **Never argue or push back** if someone is not interested.\n\n## Scenario Handling (Summary)\n* **Not Interested:** Polite thank you, end call.\n* **Wrong Number/Not Owner:** Apologize, end call.\n* **Busy/Call Back:** Acknowledge, ask for better time, end call.\n* **Wants Removal (DNC)::** Apologize, confirm removal, end call.\n* **Interested Lead:** Gather key info (Price, Time, Condition), promise a callback from a specialist, and end the call.\n* **Unsure/Maybe:** Gather what info you can, promise a callback, and end the call.\n\n## Knowledge Base (Minimal - Keep it focused)\n* **Your Goal:** Identify homeowners potentially interested in selling.\n* **Your Offer (Implied):** Your company buys properties.\n* **Key Info Needed:** Are they the owner? Open to selling? Price range? Timeline? General condition?\n* **Acquisitions Team:** A specialist will call back based on the information you gather.\n\n## Call Management\n* If there's significant background noise: \"Sorry, it's a bit noisy on my end, could you possibly repeat that?\"\n* Stick to the script's purpose; avoid getting drawn into long off-topic conversations. Gently guide back: \"Just quickly then, regarding the property...\"\n* At anytime when you have to end the call, use a brief greeting like 'Thanks for your time, and have a good day!'. Do not use single word abrupt 'Goodbye' type greetings.",
+                "role": "system"
+            }
+        ],
+        "tools": null,
+        "tool_ids": null,
+        "knowledge_base": null,
+        "model": "gemini-2.5-flash-lite",
+        "provider": "google",
+        "realtime_config": null,
+        "temperature": null,
+        "max_tokens": null,
+        "emotion_recognition_enabled": null,
+        "num_fast_turns": null
+    },
+    "voice": {
+        "caching_enabled": null,
+        "provider": "vapi",
+        "voice_id": "Paige",
+        "speed": null,
+        "chunk_plan": null,
+        "fallback_plan": null
+    },
+    "first_message": "Hi, I'm calling for the owner of 515 South Aiken Ave Apartment 903? My name is Vanessa with Mozart Management.",
+    "first_message_interruptions_enabled": null,
+    "first_message_mode": null,
+    "voicemail_detection": null,
+    "client_messages": null,
+    "server_messages": [
+        "end-of-call-report"
+    ],
+    "max_duration_seconds": null,
+    "background_sound": null,
+    "model_output_in_messages_enabled": null,
+    "transport_configurations": null,
+    "observability_plan": null,
+    "credentials": null,
+    "hooks": null,
+    "name": "Vanessa",
+    "voicemail_message": null,
+    "end_call_message": null,
+    "end_call_phrases": null,
+    "compliance_plan": null,
+    "metadata": null,
+    "background_speech_denoising_plan": null,
+    "analysis_plan": {
+        "min_messages_threshold": null,
+        "summary_plan": null,
+        "structured_data_plan": {
+            "messages": [
+                {
+                    "content": "You will be given a transcript of a call and the system prompt of the AI participant. Your task is to analyze the conversation and extract the following key details about the property owner's selling intent.\n\nopenness: Determine the owner's willingness to sell. It must be one of the following exact values: \"Interested\", \"Maybe\", \"Not Interested\", or \"Unsure\".\n\ntiming: If mentioned, capture the owner's estimated timeline for selling. Extract their specific words (e.g., \"Next spring,\" \"in a year or two,\" \"not for a while\").\n\nprice: If mentioned, capture the price range the owner is thinking of. Extract their specific words (e.g., \"$500,000,\" \"at least 450k,\" \"whatever the market rate is\").\n\nnotes: Extract any other critical information. This includes details about the property's condition (e.g., \"needs a new roof\"), specific requests from the owner (e.g., \"wants to talk to John\"), or important context (e.g., \"called at a bad time,\" \"asked to be put on the do-not-call list\").\n\nBased on the information you extract, fill in the structured data fields.\n\nJson Schema:\n{{schema}}\n\nOnly respond with the JSON.",
+                    "role": "system"
+                },
+                {
+                    "content": "Here is the transcript:\n\n{{transcript}}\n\n. Here is the ended reason of the call:\n\n{{endedReason}}\n\n",
+                    "role": "user"
+                }
+            ],
+            "enabled": true,
+            "schema_": {
+                "type": "object",
+                "items": null,
+                "properties": {
+                    "notes": {
+                        "type": "string"
+                    },
+                    "price": {
+                        "type": "string"
+                    },
+                    "timing": {
+                        "type": "string"
+                    },
+                    "openness": {
+                        "type": "string",
+                        "enum": [
+                            "Interested",
+                            "Maybe",
+                            "Uninterested",
+                            "Unsure"
+                        ]
+                    }
+                },
+                "description": null,
+                "pattern": null,
+                "format": null,
+                "required": [
+                    "openness"
+                ],
+                "enum": null,
+                "title": null
+            },
+            "timeout_seconds": null
+        },
+        "structured_data_multi_plan": null,
+        "success_evaluation_plan": null,
+        "outcome_ids": null
+    },
+    "artifact_plan": null,
+    "start_speaking_plan": null,
+    "stop_speaking_plan": {
+        "num_words": 3.0,
+        "voice_seconds": 0.0,
+        "backoff_seconds": null,
+        "acknowledgement_phrases": null,
+        "interruption_phrases": null
+    },
+    "monitor_plan": null,
+    "credential_ids": null,
+    "server": {
+        "timeout_seconds": 20.0,
+        "credential_id": null,
+        "url": "https://hardenable-convalescently-sheena.ngrok-free.dev/webhook/vapi",
+        "headers": null,
+        "backoff_plan": null
+    },
+    "keypad_input_plan": null,
+    "id": "04edfcb8-98db-4f43-918e-0a573b4d94e4",
+    "org_id": "0b5160aa-5cd7-439d-aec0-cd5d3a77b518",
+    "created_at": "2025-10-18T22:08:35.648000Z",
+    "updated_at": "2025-10-19T01:34:13.243000Z",
+    "endCallFunctionEnabled": true,
+    "isServerUrlSecretSet": false
+}

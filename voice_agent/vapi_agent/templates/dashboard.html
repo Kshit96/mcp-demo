@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vanessa - Call Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Auto-refresh the page every 10 seconds -->
+    <meta http-equiv="refresh" content="10">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800">
+
+    <div class="container mx-auto p-4 sm:p-6 lg:p-8">
+        <header class="mb-8">
+            <h1 class="text-3xl font-bold text-gray-900">Vanessa - AI Acquisitions Agent</h1>
+            <p class="text-gray-600 mt-1">Live Call Log Dashboard (Refreshes every 10 seconds)</p>
+        </header>
+
+        <div class="bg-white shadow-md rounded-lg overflow-hidden">
+            <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-100">
+                        <tr>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Timestamp</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Openness</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Timing</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Price</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Notes & Summary</th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-gray-200">
+                        <!-- If no logs, show a placeholder row -->
+                        {% if not logs %}
+                        <tr>
+                            <td colspan="5" class="px-6 py-4 text-center text-gray-500">No calls logged yet. Make a call to see data here.</td>
+                        </tr>
+                        {% endif %}
+                        
+                        <!-- Loop through logs and display each one -->
+                        {% for log in logs %}
+                        <tr class="hover:bg-gray-50">
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{{ log.timestamp }}</td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                {% if log.openness == 'Interested' %}
+                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">Interested</span>
+                                {% elif log.openness == 'Maybe' or log.openness == 'Unsure' %}
+                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">Maybe</span>
+                                {% else %}
+                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">{{ log.openness }}</span>
+                                {% endif %}
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-800">{{ log.timing or 'N/A' }}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-800">{{ log.price or 'N/A' }}</td>
+                            <td class="px-6 py-4 text-sm text-gray-800">
+                                <p class="font-semibold">Notes:</p>
+                                <p class="text-gray-600">{{ log.notes or 'No specific notes.' }}</p>
+                                <p class="font-semibold mt-2">Summary:</p>
+                                <p class="text-gray-600">{{ log.summary or 'N/A' }}</p>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>
